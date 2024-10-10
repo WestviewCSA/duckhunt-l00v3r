@@ -119,12 +119,12 @@ public class Character {
 		g2.drawImage(img, tx, null);
 		
 		
-		if(showHitBox) 
-		{
-			g.setColor(Color.green);
-			g2.setStroke(new BasicStroke(5));
-			g2.drawRect(x+8, y+6, width, height);
-		}
+		//if(showHitBox) 
+		//{
+		//	g.setColor(Color.green);
+		//	g2.setStroke(new BasicStroke(5));
+		//	g2.drawRect(x+8, y+6, width, height);
+		//}
 		
 	}
 
