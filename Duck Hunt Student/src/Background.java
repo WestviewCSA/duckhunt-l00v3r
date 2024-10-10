@@ -7,10 +7,9 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
 
-public class SkeletonHead extends Character{
-	
-	public SkeletonHead() {
-		super("realskull.gif");
-	}
+public class Background extends Character{
 
+	public Background() {
+		super("bg1.png");
+	}
 }

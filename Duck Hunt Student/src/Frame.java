@@ -20,6 +20,8 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	Font bigFont = new Font("Serif", Font.PLAIN, 60);
 	Font medFont = new Font("Serif", Font.PLAIN, 30);
+	Font smFont = new Font("Serif", Font.PLAIN, 15);
+
 
 	
 	//create duck/skeleton head
@@ -42,6 +44,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	int score;
 	long time; //long is bigger int that can hold bigger whole numbers
 	int wave;
+	int randVx = (int)(Math.random()*(5+5+1)-5);
+	int randVy = (int)(Math.random()*(-5+3+1)-3);
+	int randX = (int)(Math.random()*(691)+10);
+
 	
 	//initialize any variables, objects, etc for the "start" of the game
 	public void init() {
@@ -54,9 +60,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		dog.setXY(170, 350);
 		
 		duck.setWidthHeight(60, 60);
-		duck.setXY(400, 400);
-		duck.setVx(1);
-		duck.setVy(-1);
+		duck.setX(randX);
+		duck.setY(400);
+		duck.setVx(randVx);
+		duck.setVy(randVy);
 		StdAudio.playInBackground("clack.wav");
 	}
 	
@@ -70,12 +77,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		roundTimer += 30;
 		
 		duck.setXY(420, 430);
-		duck.setVy(-5);
-		duck.setVx(5);
+		duck.setVx(2*wave);
+		duck.setVy(-2*wave);
 		
 		dog.setXY(170, 350);
 		dog.setVx(0);
-		dog.setVx(0);
+		dog.setVy(0);
 	}
 	
 	public void paint(Graphics g) {
@@ -84,22 +91,13 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		//add 16 to time since paint is called every 20 ms
 		time += 20; //time elapse updates
 		
-		if(time%100 == 0) {
+		if(time%1000 == 0) {
 			roundTimer -= 1;
 			if(roundTimer == 0) {
 				t.stop(); //stops the timer after this round is over
 				nextRound();
-				g.drawString("Wave Complete", 200, 250);
 			}
 		}
-		
-		//text for moving to next round
-		if(roundTimer==30) {
-			g.setFont(medFont);
-			g.drawString("Press the space bar for next wave", 200, 100);
-		}
-		
-		g.setFont(bigFont);
 		
 		//draw the round String
 		
@@ -111,55 +109,78 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		fore.paint(g);
 		
 		//logic for resetting the duck position
-		//and or making it bounce around
-		if(duck.getY() > 500) {
-			duck.setXY(420, 430);
-			if(dog.getY() == 350) {
-				duck.setVy(-3);
-				duck.setVx(3);
-				StdAudio.playInBackground("clack.wav");
+		if(duck.getY() > 500 && dog.getY() == 350) {
+			duck.setY(430);
+			if(dog.getX() != 0) {
+				duck.setX((int)(Math.random()*(691)+10));
+				duck.setVx((int)(Math.random()*(5+5+1)-5));
+				duck.setVy((int)(Math.random()*(-5+3+1)-3));
 			}
-			else {
-				duck.setVy(0);
-				duck.setVx(0);
+			if(wave > 1) {
+				duck.setX((int)(Math.random()*(691)+10));
+				duck.setVx((int)(Math.random()*(5+5+1)-5)*wave);
+				duck.setVy((int)(Math.random()*(-5+3+1)-3)*wave);
+				}
 			}
+
+		//for cat moving
+		if(dog.getY() < 240) {
+			dog.setVy(4);
+			}
+		if(dog.getY() > 350) {
+			dog.setXY(170, 350);
+			dog.setVy(0);
 		}
-		else if(duck.getY() < 0) {
+		//for making skull bounce around
+		if(duck.getY() < 0) {
 			duck.setVy(duck.getVy()*-1);
+			StdAudio.playInBackground("clang.wav");
 		}
-		else if(duck.getX() < 0) {
-			duck.setVx(duck.getVx()*1);
-		}
-		else if(duck.getX() < 800) {
+		if(duck.getX() < 0) {
 			duck.setVx(duck.getVx()*-1);
+			StdAudio.playInBackground("bonesHurt.wav");
+
+		}
+		if(duck.getX() > 720) {
+			duck.setVx(duck.getVx()*-1);
+			StdAudio.playInBackground("ouch.wav");
+
 		}
 		
 		//draw time related Strings last so they are overlaid on top of everything else
-		g.setFont(bigFont);
+		
+		//text for after a round ends
+		if(!t.isRunning()) {
+			g.setFont(smFont);
+			g.setColor(Color.red);
+			g.drawString("Press the space bar for next round!", 290, 200);
+			g.setFont(bigFont);
+			g.setColor(Color.white);
+			g.drawString("Round Complete", 200, 250);
+			StdAudio.playInBackground("waveComplete.wav");
+		}
+		
+		g.setFont(medFont);
 		g.setColor(Color.white);
 		
 		// scoring
-		g.drawString("Score: "+this.score, 220, 550);
+		g.drawString("Score: "+this.score, 400, 550);
 		
 		//timer
 		if(roundTimer >= 10) {
-			g.drawString("Time: "+this.roundTimer, 560, 550);
+			g.drawString("Time: "+this.roundTimer, 660, 550);
 		}
 		else if(roundTimer >= 0 && roundTimer < 10) {
-			g.drawString("Time: "+this.roundTimer, 560, 550);
+			g.drawString("Time: "+this.roundTimer, 660, 550);
 		}
 		else {
 			duck.setVx(0);
 			duck.setXY(420, 430);
-			g.drawString("Wave Complete", 200, 250);
-			if(time == 0) {
-					StdAudio.playInBackground("waveComplete.wav");
-			}
 		}
 		
 		//waves
 		g.setFont(medFont);
-		g.drawString("Wave: "+this.wave, 10, 30);
+		g.drawString("Round: "+this.wave, 10, 30);
 		
 	}
 	
@@ -223,7 +244,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 						duck.setVy(10);
 						duck.setVx(0);
 						score += 1;
-						dog.setXY(170, 260);
+						dog.setVy(-4);
 						StdAudio.playInBackground("meow.wav");
 					}
 				}
